@@ -33,7 +33,9 @@ urlpatterns += [
 ]
 
 urlpatterns += [
-
+    path('api/v1/account/', include('apps.account.urls')),
+    path('api/v1/site/', include('apps.conf_site.urls')),
+    path('api/v1/cyberdoc/', include('apps.cyberdoc.urls')),
 ]
 
 
