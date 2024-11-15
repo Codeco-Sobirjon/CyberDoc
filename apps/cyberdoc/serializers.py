@@ -41,7 +41,7 @@ class OrderWorkSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = OrderWork
-        fields = ['number_of_order', 'type_cons', 'item', 'theme', 'min_page_size',
+        fields = ['id', 'number_of_order', 'type_cons', 'item', 'theme', 'min_page_size',
                   'number_of_sources_literature', 'deadline', 'qualification_author',
                   'shrift', 'guarantee', 'text', 'file', 'author', 'rating', 'review_list']
 
@@ -67,7 +67,7 @@ class OrderWorkCreateAndUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderWork
         fields = [
-            'type_cons', 'item', 'theme', 'min_page_size',
+            'id', 'type_cons', 'item', 'theme', 'min_page_size',
             'number_of_sources_literature', 'deadline', 'qualification_author',
             'shrift', 'guarantee', 'text', 'file'
         ]
