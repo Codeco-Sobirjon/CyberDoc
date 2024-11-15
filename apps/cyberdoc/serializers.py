@@ -114,7 +114,7 @@ class OrderWorkCreateAndUpdateSerializer(serializers.ModelSerializer):
 class OrderWorkReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderWorkReview
-        fields = ('id', 'rating', 'text', 'user', 'order_work', 'created_at')
+        fields = ('id', 'rating', 'text', 'order_work', 'created_at')
         read_only_fields = ('created_at',)
 
     def validate_rating(self, value):

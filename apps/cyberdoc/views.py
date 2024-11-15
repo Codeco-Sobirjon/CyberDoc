@@ -187,7 +187,7 @@ class OrderWorkReviewListCreateAPIView(APIView):
         operation_description="Create a new review for an order."
     )
     def post(self, request, *args, **kwargs):
-        serializer = OrderWorkReviewSerializer(data=request.data)
+        serializer = OrderWorkReviewSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save(user=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
