@@ -8,7 +8,7 @@ ALLOWED_HOSTS = ['*']
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'istombroker',
+        'NAME': 'cyberdoc',
         'USER': 'postgres',
         "PASSWORD": "0576",
         "HOST": "localhost",
