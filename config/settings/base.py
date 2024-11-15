@@ -21,6 +21,7 @@ LOCAL_APPS = [
     'apps.account',
     'apps.conf_site',
     'apps.cyberdoc',
+    'apps.chat'
 ]
 
 THIRD_PARTY_APPS = [
@@ -33,9 +34,9 @@ THIRD_PARTY_APPS = [
     *LOCAL_APPS,
 ]
 
-# Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     *THIRD_PARTY_APPS,
     'django.contrib.admin',
     'django.contrib.auth',
@@ -43,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
 ]
 
 LOCAL_MIDDLEWARE = [
@@ -80,6 +82,7 @@ TEMPLATES = [
     },
 ]
 
+ASGI_APPLICATION = 'config.asgi.application'
 WSGI_APPLICATION = 'config.wsgi.application'
 
 # Password validation
@@ -119,7 +122,7 @@ USE_TZ = True
 LOCALE_PATHS = [os.path.join(BASE_DIR, "locale/")]
 
 STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -246,4 +249,10 @@ CKEDITOR_UPLOAD_SLUGIFY_FILENAME = False
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+}
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    },
 }

@@ -36,8 +36,9 @@ urlpatterns += [
     path('api/v1/account/', include('apps.account.urls')),
     path('api/v1/site/', include('apps.conf_site.urls')),
     path('api/v1/cyberdoc/', include('apps.cyberdoc.urls')),
+    path('api/v1/chat/', include('apps.chat.urls')),
 ]
 
-
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 urlpatterns += [re_path(r"^media/(?P<path>.*)$", serve, {"document_root": settings.MEDIA_ROOT,},),]
