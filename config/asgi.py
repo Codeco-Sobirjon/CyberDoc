@@ -3,7 +3,7 @@ import os
 import django
 from channels.auth import AuthMiddlewareStack
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings.local')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings.server')
 django.setup()
 from django.core.asgi import get_asgi_application
 from apps.chat.routing import websocket_urlpatterns
