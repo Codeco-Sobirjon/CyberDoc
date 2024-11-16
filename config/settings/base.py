@@ -166,11 +166,20 @@ customColorPalette = [
     {'color': 'hsl(207, 90%, 54%)', 'label': 'Blue'},
 ]
 
-CORS_ALLOWED_ORIGINS = [
+CSRF_TRUSTED_ORIGINS = [
+    "http://31.129.111.22:8000",
     "http://localhost:3000",
+    "http://localhost:8000",
     "http://127.0.0.1:5173",
-    "http://127.0.0.1:8000",
 ]
+
+CORS_ALLOWED_ORIGINS = [
+    "http://31.129.111.22:8000",
+    "http://localhost:3000",
+    "http://localhost:8000",
+    "http://127.0.0.1:5173",
+]
+
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
@@ -246,11 +255,6 @@ CKEDITOR_5_UPLOAD_FILE_TYPES = ['jpeg', 'pdf', 'png']
 CKEDITOR_UPLOAD_PATH = "uploads/"
 CKEDITOR_IMAGE_BACKEND = "pillow"
 CKEDITOR_UPLOAD_SLUGIFY_FILENAME = False
-CSRF_TRUSTED_ORIGINS = ['http://31.129.111.22',]
-CSRF_COOKIE_SECURE = True
-SESSION_COOKIE_SECURE = True
-SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
