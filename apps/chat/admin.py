@@ -5,7 +5,7 @@ from apps.chat.models import Conversation, Message
 class MessageInline(admin.TabularInline):
     model = Message
     extra = 1
-    fields = ('sender__phone', 'text', 'attachment', 'timestamp')
+    fields = ('sender', 'text', 'attachment', 'timestamp')
     readonly_fields = ('timestamp',)
     verbose_name = "Сообщение"
     verbose_name_plural = "Сообщения"
