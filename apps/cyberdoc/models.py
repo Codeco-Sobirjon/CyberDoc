@@ -116,9 +116,6 @@ class OrderWorkFiles(models.Model):
 
     objects = models.Manager()
 
-    def __str__(self):
-        return self.order_work
-
 
 class OrderWorkReview(models.Model):
     rating = models.IntegerField(
