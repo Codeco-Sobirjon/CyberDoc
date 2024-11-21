@@ -44,13 +44,20 @@ class OrderWorkSerializer(serializers.ModelSerializer):
     author = CustomUserDeatilSerializer()
     rating = serializers.SerializerMethodField()
     review_list = serializers.SerializerMethodField()
-    files = OrderWorkFileSizeSerializer(many=True, read_only=True)
+    files = serializers.SerializerMethodField()
 
     class Meta:
         model = OrderWork
         fields = ['id', 'number_of_order', 'type_cons', 'item', 'theme', 'min_page_size',
                   'number_of_sources_literature', 'deadline', 'qualification_author',
                   'shrift', 'guarantee', 'text', 'files', 'author', 'rating', 'review_list', 'foreign_sources']
+
+    def get_files(self, obj):
+        files = OrderWorkFiles.objects.select_related('order_work').filter(order_work=obj)
+        if files.exists():
+            serializer = OrderWorkSerializer(files, many=True, context={'request': self.context.get('request')})
+            return serializer.data()
+        return []
 
     def get_rating(self, obj):
         reviews = OrderWorkReview.objects.select_related('order_work').filter(order_work=obj)
