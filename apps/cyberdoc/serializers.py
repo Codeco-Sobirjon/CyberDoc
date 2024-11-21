@@ -86,7 +86,7 @@ class OrderWorkCreateAndUpdateSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         author = self.context['request'].user
-        uploaded_files = validated_data.pop("uploaded_files")
+        uploaded_files = validated_data.pop("uploaded_files", [])
         order_work = OrderWork.objects.create(
             author=author,
             **validated_data
