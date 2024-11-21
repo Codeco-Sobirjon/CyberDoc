@@ -46,6 +46,7 @@ class ChatConsumer(WebsocketConsumer):
             text_data_json.get("attachment"),
         )
         conversation = Conversation.objects.get(id=int(self.room_name))
+
         sender = self.scope['user']
 
         if attachment:

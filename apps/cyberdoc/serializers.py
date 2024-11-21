@@ -3,7 +3,13 @@ from rest_framework import serializers
 
 from apps.account.serializers import CustomUserDeatilSerializer
 from apps.cyberdoc.models import TypeConsultation, QualificationAuthor, Shrift, Guarantee, OrderWork, OrderWorkReview, \
-    DescribeProblem
+    DescribeProblem, OrderWorkFiles
+
+
+class OrderWorkFileSizeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrderWorkFiles
+        fields = '__all__'
 
 
 class TypeConsultationSerializer(serializers.ModelSerializer):
@@ -38,6 +44,7 @@ class OrderWorkSerializer(serializers.ModelSerializer):
     author = CustomUserDeatilSerializer()
     rating = serializers.SerializerMethodField()
     review_list = serializers.SerializerMethodField()
+    files = OrderWorkFileSizeSerializer(many=True, read_only=True)
 
     class Meta:
         model = OrderWork
@@ -63,21 +70,29 @@ class OrderWorkCreateAndUpdateSerializer(serializers.ModelSerializer):
     qualification_author = serializers.PrimaryKeyRelatedField(queryset=QualificationAuthor.objects.all())
     shrift = serializers.PrimaryKeyRelatedField(queryset=Shrift.objects.all())
     guarantee = serializers.PrimaryKeyRelatedField(queryset=Guarantee.objects.all())
+    files = OrderWorkFileSizeSerializer(many=True, read_only=True)
+    uploaded_files = serializers.ListField(
+        child=serializers.FileField(allow_empty_file=False, use_url=False),
+        write_only=True
+    )
 
     class Meta:
         model = OrderWork
         fields = [
             'id', 'type_cons', 'item', 'theme', 'min_page_size',
             'number_of_sources_literature', 'deadline', 'qualification_author',
-            'shrift', 'guarantee', 'text', 'file'
+            'shrift', 'guarantee', 'text', 'uploaded_files', 'files'
         ]
 
     def create(self, validated_data):
         author = self.context['request'].user
+        uploaded_files = validated_data.pop("uploaded_files")
         order_work = OrderWork.objects.create(
             author=author,
             **validated_data
         )
+        for file in uploaded_files:
+            OrderWorkFiles.objects.create(order_work=order_work, file=file)
 
         return order_work
 

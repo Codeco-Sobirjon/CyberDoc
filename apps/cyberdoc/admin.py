@@ -1,7 +1,7 @@
 from django.contrib import admin
 from apps.cyberdoc.models import (
     TypeConsultation, QualificationAuthor,
-    Shrift, Guarantee, OrderWork, OrderWorkReview, DescribeProblem
+    Shrift, Guarantee, OrderWork, OrderWorkReview, DescribeProblem, OrderWorkFiles
 )
 
 
@@ -25,10 +25,16 @@ class GuaranteeAdmin(admin.ModelAdmin):
     search_fields = ('name',)
 
 
+class OrderWorkFilesInlenes(admin.TabularInline):
+    model = OrderWorkFiles
+    fields = ['id', 'file']
+
+
 class OrderWorkAdmin(admin.ModelAdmin):
     list_display = ('number_of_order', 'item', 'theme', 'deadline', 'author')
     search_fields = ('number_of_order', 'item', 'theme')
     list_filter = ('type_cons', 'qualification_author', 'shrift', 'guarantee', 'deadline')
+    inlines = [OrderWorkFilesInlenes]
 
 
 @admin.register(OrderWorkReview)

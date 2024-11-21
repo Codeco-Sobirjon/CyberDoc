@@ -81,7 +81,7 @@ class OrderWork(models.Model):
         verbose_name=_("Гарантия"), related_name="order_guarantee"
     )
     text = models.TextField(null=True, blank=True, verbose_name=_("Текст"))
-    file = models.FileField(upload_to='order_work/', null=True, blank=True, verbose_name=_("Файл"))
+
     author = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=True,
                                verbose_name="Автор заказа", related_name="order_user")
     created_at = models.DateField(auto_now_add=True, null=True, blank=True, verbose_name=_("Дата публикации"))
@@ -102,6 +102,21 @@ class OrderWork(models.Model):
     class Meta:
         verbose_name = _("5. Заказ на работу")
         verbose_name_plural = _("5. Заказы на работу")
+
+
+class OrderWorkFiles(models.Model):
+    order_work = models.ForeignKey(
+        OrderWork, on_delete=models.CASCADE, null=False, blank=False,
+        verbose_name=_("Заказ на работу"), related_name="order_work_file"
+    )
+    file = models.FileField(upload_to='order_work/', null=True, blank=True, verbose_name=_("Файл"))
+
+    created_at = models.DateField(auto_now_add=True, null=True, blank=True, verbose_name=_("Дата публикации"))
+
+    objects = models.Manager()
+
+    def __str__(self):
+        return self.order_work
 
 
 class OrderWorkReview(models.Model):
