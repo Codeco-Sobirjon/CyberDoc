@@ -50,7 +50,7 @@ class OrderWorkSerializer(serializers.ModelSerializer):
         model = OrderWork
         fields = ['id', 'number_of_order', 'type_cons', 'item', 'theme', 'min_page_size',
                   'number_of_sources_literature', 'deadline', 'qualification_author',
-                  'shrift', 'guarantee', 'text', 'file', 'author', 'rating', 'review_list']
+                  'shrift', 'guarantee', 'text', 'files', 'author', 'rating', 'review_list']
 
     def get_rating(self, obj):
         reviews = OrderWorkReview.objects.select_related('order_work').filter(order_work=obj)
