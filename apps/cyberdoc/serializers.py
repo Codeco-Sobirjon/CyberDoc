@@ -72,7 +72,7 @@ class OrderWorkCreateAndUpdateSerializer(serializers.ModelSerializer):
     guarantee = serializers.PrimaryKeyRelatedField(queryset=Guarantee.objects.all())
     files = OrderWorkFileSizeSerializer(many=True, read_only=True)
     uploaded_files = serializers.ListField(
-        child=serializers.FileField(allow_empty_file=False, use_url=False),
+        child=serializers.FileField(allow_empty_file=True, use_url=False),
         write_only=True
     )
 
