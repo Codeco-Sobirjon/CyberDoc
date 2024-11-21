@@ -67,6 +67,7 @@ class OrderWork(models.Model):
     theme = models.CharField(max_length=250, null=False, blank=False, verbose_name=_("Тема"))
     min_page_size = models.IntegerField(default=0, null=False, blank=False, verbose_name=_("Минимальный объем страниц"))
     number_of_sources_literature = models.IntegerField(default=0, null=False, blank=False, verbose_name=_("Количество источников литературы"))
+    foreign_sources = models.BooleanField(null=True, blank=True, verbose_name="Иностранные источники")
     deadline = models.DateField(null=True, blank=True, verbose_name=_("Срок выполнения"))
     qualification_author = models.ForeignKey(
         QualificationAuthor, on_delete=models.CASCADE, null=False, blank=False,
