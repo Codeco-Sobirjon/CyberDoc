@@ -9,7 +9,7 @@ from apps.cyberdoc.models import TypeConsultation, QualificationAuthor, Shrift, 
 class OrderWorkFileSizeSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderWorkFiles
-        fields = '__all__'
+        fields = ['id', 'file']
 
 
 class TypeConsultationSerializer(serializers.ModelSerializer):
@@ -55,8 +55,8 @@ class OrderWorkSerializer(serializers.ModelSerializer):
     def get_files(self, obj):
         files = OrderWorkFiles.objects.select_related('order_work').filter(order_work=obj)
         if files.exists():
-            serializer = OrderWorkSerializer(files, many=True, context={'request': self.context.get('request')})
-            return serializer.data()
+            serializer = OrderWorkFileSizeSerializer(files, many=True, context={'request': self.context.get('request')})
+            return serializer.data
         return []
 
     def get_rating(self, obj):
