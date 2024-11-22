@@ -176,7 +176,7 @@ class PortfolioSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Portfolio
-        fields = ['id', 'name', 'user', 'file', 'views',  'created_at']
+        fields = ['id', 'name', 'file', 'views',  'created_at']
 
     def create(self, validated_data):
         user = self.context.get('request').user
