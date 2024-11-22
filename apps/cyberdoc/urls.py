@@ -17,4 +17,7 @@ urlpatterns = [
     path('reviews/', OrderWorkReviewListCreateAPIView.as_view(), name='orderworkreview-list-create'),
 
     path('problems/', DescribeProblemListCreateAPIView.as_view(), name='describe_problem_list_create'),
+
+    path('portfolio/', PortfolioListView.as_view(), name='portfolio_list_create'),
+    path('porfolio/<int:id>/', PortfolioDetailView.as_view(), name='portfolio_list_create'),
 ]
