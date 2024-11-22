@@ -1,7 +1,8 @@
 from django.contrib import admin
 from apps.cyberdoc.models import (
     TypeConsultation, QualificationAuthor,
-    Shrift, Guarantee, OrderWork, OrderWorkReview, DescribeProblem, OrderWorkFiles
+    Shrift, Guarantee, OrderWork, OrderWorkReview, DescribeProblem, OrderWorkFiles,
+    Portfolio
 )
 
 
@@ -50,6 +51,12 @@ class DescribeProblemAdmin(admin.ModelAdmin):
     list_display = ('user', 'created_at')
     list_filter = ['user']
     search_fields = ('user__username',)
+
+
+@admin.register(Portfolio)
+class PortfolioAdmin(admin.ModelAdmin):
+    list_display = ('user', 'name',  'created_at', 'id')
+    search_fields = ['name']
 
 
 admin.site.register(TypeConsultation, TypeConsultationAdmin)

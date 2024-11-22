@@ -69,6 +69,7 @@ class OrderWork(models.Model):
     number_of_sources_literature = models.IntegerField(default=0, null=False, blank=False, verbose_name=_("Количество источников литературы"))
     foreign_sources = models.BooleanField(null=True, blank=True, verbose_name="Иностранные источники")
     deadline = models.DateField(null=True, blank=True, verbose_name=_("Срок выполнения"))
+    
     qualification_author = models.ForeignKey(
         QualificationAuthor, on_delete=models.CASCADE, null=False, blank=False,
         verbose_name=_("Квалификация автора"), related_name="order_qualification_author"
@@ -160,3 +161,24 @@ class DescribeProblem(models.Model):
     class Meta:
         verbose_name = _("Описание проблемы")
         verbose_name_plural = _("Описания проблем")
+
+
+class Portfolio(models.Model):
+    name = models.CharField(max_length=250, null=True, blank=True, verbose_name=_('Название портфолио'))
+    user = models.ForeignKey(
+        CustomUser, on_delete=models.CASCADE, null=False, blank=False,
+        verbose_name=_("Пользователь"), related_name="user_portfolio"
+    )
+    file = models.FileField(upload_to='portfolio/', null=True, blank=True, verbose_name=_("Файл"))
+    views = models.IntegerField(default=0, null=True, blank=True, verbose_name="Зрители")
+    created_at = models.DateField(auto_now_add=True, null=True, blank=True, verbose_name=_("Дата публикации"))
+
+    objects = models.Manager()
+
+    def __str__(self):
+        return f"пользователя {self.user} : {self.created_at}"
+
+    class Meta:
+        verbose_name = _("Пользователь портфолио")
+        verbose_name_plural = _("Пользователь портфолио")
+

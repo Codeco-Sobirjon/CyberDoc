@@ -5,11 +5,12 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import filters
 from apps.cyberdoc.filters import OrderWorkFilter
-from apps.cyberdoc.models import TypeConsultation, QualificationAuthor, Shrift, Guarantee, OrderWork, DescribeProblem
+from apps.cyberdoc.models import TypeConsultation, QualificationAuthor, Shrift, Guarantee, OrderWork, DescribeProblem, \
+    Portfolio
 from apps.cyberdoc.pagination import OrderWorkPagination
 from apps.cyberdoc.serializers import TypeConsultationSerializer, QualificationAuthorSerializer, ShriftSerializer, \
     GuaranteeSerializer, OrderWorkSerializer, OrderWorkCreateAndUpdateSerializer, OrderWorkReviewSerializer, \
-    DescribeProblemSerializer, DescribeProblemListSerializer
+    DescribeProblemSerializer, DescribeProblemListSerializer, PortfolioSerializer, PortfolioListSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
@@ -221,3 +222,73 @@ class DescribeProblemListCreateAPIView(APIView):
             serializer.save(user=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class PortfolioListView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        tags=['Portfolio'],
+        operation_description="Retrieve all portfolio entries",
+        responses={200: PortfolioListSerializer(many=True)},
+    )
+    def get(self, request):
+        portfolios = Portfolio.objects.filter(user=request.user)
+        serializer = PortfolioListSerializer(portfolios, many=True, context={'request': request})
+        return Response(serializer.data)
+
+    @swagger_auto_schema(
+        tags=['Portfolio'],
+        operation_description="Create a new portfolio entry",
+        request_body=PortfolioSerializer,
+        responses={201: PortfolioSerializer},
+    )
+    def post(self, request):
+        serializer = PortfolioSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+permission_classes = [IsAuthenticated]
+
+
+class PortfolioDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        tags=['Portfolio'],
+        operation_description="Retrieve a portfolio entry by ID",
+        responses={200: PortfolioListSerializer},
+    )
+    def get(self, request, pk):
+        portfolio = get_object_or_404(Portfolio, pk=pk)
+        portfolio.views += 1
+        portfolio.save()
+        serializer = PortfolioListSerializer(portfolio, context={'request': request})
+        return Response(serializer.data)
+
+    @swagger_auto_schema(
+        tags=['Portfolio'],
+        operation_description="Update a portfolio entry by ID",
+        request_body=PortfolioSerializer,
+        responses={200: PortfolioSerializer},
+    )
+    def put(self, request, pk):
+        portfolio = get_object_or_404(Portfolio, pk=pk)
+        serializer = PortfolioSerializer(portfolio, data=request.data, context={'request': request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @swagger_auto_schema(
+        tags=['Portfolio'],
+        operation_description="Delete a portfolio entry by ID",
+        responses={204: 'No Content'},
+    )
+    def delete(self, request, pk):
+        portfolio = get_object_or_404(Portfolio, pk=pk)
+        portfolio.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

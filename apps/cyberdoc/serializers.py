@@ -3,7 +3,7 @@ from rest_framework import serializers
 
 from apps.account.serializers import CustomUserDeatilSerializer
 from apps.cyberdoc.models import TypeConsultation, QualificationAuthor, Shrift, Guarantee, OrderWork, OrderWorkReview, \
-    DescribeProblem, OrderWorkFiles
+    DescribeProblem, OrderWorkFiles, Portfolio
 
 
 class OrderWorkFileSizeSerializer(serializers.ModelSerializer):
@@ -169,3 +169,31 @@ class DescribeProblemListSerializer(serializers.ModelSerializer):
     class Meta:
         model = DescribeProblem
         fields = ['id', 'text', 'user', 'created_at']
+
+
+class PortfolioSerializer(serializers.ModelSerializer):
+    file = serializers.FileField(allow_empty_file=True, use_url=True)
+
+    class Meta:
+        model = Portfolio
+        fields = ['id', 'name', 'user', 'file', 'views',  'created_at']
+
+    def create(self, validated_data):
+        user = self.context.get('request').user
+        create_portfolio = Portfolio.objects.create(**validated_data, user=user)
+        return create_portfolio
+
+    def update(self, instance, validated_data):
+        instance.name = validated_data.get('name', instance.name)
+        if 'file' in validated_data:
+            instance.file = validated_data['file']
+        instance.save()
+        return instance
+
+
+class PortfolioListSerializer(serializers.ModelSerializer):
+    user = CustomUserDeatilSerializer()
+
+    class Meta:
+        model = Portfolio
+        fields = ['id', 'name', 'user', 'file', 'views',  'created_at']
