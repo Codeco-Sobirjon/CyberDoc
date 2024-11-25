@@ -117,8 +117,9 @@ class CheckReceiverHasView(APIView):
             initiator=initiator
         ).select_related('receiver').filter(
             receiver=receiver
-        )
+        ).first()
         if conversation_exists:
-            return Response(True, status=status.HTTP_302_FOUND)
+            serializer = ConversationSerializer(conversation_exists, context={"request": request})
+            return Response(serializer.data, status=status.HTTP_302_FOUND)
         return Response(False, status=status.HTTP_404_NOT_FOUND)
 
