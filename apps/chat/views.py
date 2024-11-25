@@ -1,3 +1,4 @@
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -5,13 +6,14 @@ from django.shortcuts import redirect, reverse, get_object_or_404
 from django.db.models import Q
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
-
 from apps.account.models import CustomUser
 from apps.chat.models import Conversation
 from apps.chat.serializers import ConversationSerializer, ConversationListSerializer
 
 
 class StartConversationView(APIView):
+    permission_classes = [IsAuthenticated]
+
     @swagger_auto_schema(
         tags=['Chat'],
         request_body=openapi.Schema(
@@ -48,6 +50,8 @@ class StartConversationView(APIView):
 
 
 class GetConversationView(APIView):
+    permission_classes = [IsAuthenticated]
+
     @swagger_auto_schema(
         tags=['Chat'],
         responses={
@@ -64,6 +68,8 @@ class GetConversationView(APIView):
 
 
 class ConversationListView(APIView):
+    permission_classes = [IsAuthenticated]
+
     @swagger_auto_schema(
         tags=['Chat'],
         responses={
@@ -81,4 +87,37 @@ class ConversationListView(APIView):
         serializer = ConversationListSerializer(conversation_list, many=True)
         return Response(serializer.data)
 
+
+class CheckReceiverHasView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_summary="Check if a conversation exists",
+        operation_description="This endpoint checks whether a conversation exists between the logged-in user "
+                              "(initiator) and a specific user (receiver) by their ID.",
+        responses={
+            302: openapi.Response("Conversation exists (True)"),
+            404: openapi.Response("Conversation does not exist (False)"),
+        },
+        manual_parameters=[
+            openapi.Parameter(
+                'id',
+                openapi.IN_PATH,
+                description="ID of the receiver (CustomUser ID)",
+                type=openapi.TYPE_INTEGER,
+                required=True,
+            )
+        ]
+    )
+    def get(self, request, *args, **kwargs):
+        initiator = request.user
+        receiver = get_object_or_404(CustomUser, id=kwargs.get('id'))
+        conversation_exists = Conversation.objects.select_related('initiator').filter(
+            initiator=initiator
+        ).select_related('receiver').filter(
+            receiver=receiver
+        )
+        if conversation_exists:
+            return Response(True, status=status.HTTP_302_FOUND)
+        return Response(False, status=status.HTTP_404_NOT_FOUND)
 

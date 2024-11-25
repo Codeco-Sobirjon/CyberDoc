@@ -14,6 +14,8 @@ class Conversation(models.Model):
     )
     start_time = models.DateTimeField(auto_now_add=True, verbose_name=_("Время начала"))
 
+    objects = models.Manager()
+
     class Meta:
         verbose_name = _("Беседа")
         verbose_name_plural = _("Беседы")
@@ -36,6 +38,8 @@ class Message(models.Model):
     timestamp = models.DateTimeField(
         auto_now_add=True, verbose_name=_("Время отправки")
     )
+
+    objects = models.Manager()
 
     class Meta:
         verbose_name = _("Сообщение")
