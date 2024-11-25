@@ -92,6 +92,7 @@ class CheckReceiverHasView(APIView):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
+        tags=['Chat'],
         operation_summary="Check if a conversation exists",
         operation_description="This endpoint checks whether a conversation exists between the logged-in user "
                               "(initiator) and a specific user (receiver) by their ID.",
