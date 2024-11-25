@@ -159,8 +159,8 @@ class DescribeProblem(models.Model):
         return f"пользователя {self.user} : {self.created_at}"
 
     class Meta:
-        verbose_name = _("Описание проблемы")
-        verbose_name_plural = _("Описания проблем")
+        verbose_name = _("7. Описание проблемы")
+        verbose_name_plural = _("7. Описания проблем")
 
 
 class Portfolio(models.Model):
@@ -179,6 +179,6 @@ class Portfolio(models.Model):
         return f"пользователя {self.user} : {self.created_at}"
 
     class Meta:
-        verbose_name = _("Пользователь портфолио")
-        verbose_name_plural = _("Пользователь портфолио")
+        verbose_name = _("8. Пользователь портфолио")
+        verbose_name_plural = _("8. Пользователь портфолио")
 
