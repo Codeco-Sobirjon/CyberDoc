@@ -1,4 +1,5 @@
 from django.contrib.auth.models import Group
+from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -168,4 +169,16 @@ class CustomUserFilterAPIView(APIView):
 
         serializer = CustomUserDeatilSerializer(queryset, many=True, context={'request': request})
 
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class FilterUserView(APIView):
+    permission_classes = [AllowAny]
+    @swagger_auto_schema(
+        responses={200: CustomUserDeatilSerializer()},
+        operation_description="Retrieve details of the authenticated user.", tags=['Account']
+    )
+    def get(self, request, *args, **kwargs):
+        queryset = get_object_or_404(CustomUser, id=kwargs.get('id'))
+        serializer = CustomUserDeatilSerializer(queryset, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)

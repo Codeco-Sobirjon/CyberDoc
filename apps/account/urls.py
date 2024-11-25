@@ -11,5 +11,6 @@ urlpatterns = [
     path('update-password/', PasswordUpdateView.as_view(), name='update-password'),
     path('user/statics/', StatisticsCustomUserView.as_view(), name='statics-user'),
     path('custom-user-filters/', CustomUserFilterAPIView.as_view(), name='custom_user_filters'),
+    path('custom-user-get/', FilterUserView.as_view(), name='custom_user_filters'),
     path('token/refresh/', TokenRefreshSlidingView.as_view(), name='token_refresh'),
 ]

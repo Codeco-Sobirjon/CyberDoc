@@ -121,5 +121,5 @@ class CheckReceiverHasView(APIView):
         if conversation_exists:
             serializer = ConversationSerializer(conversation_exists, context={"request": request})
             return Response(serializer.data, status=status.HTTP_302_FOUND)
-        return Response(False, status=status.HTTP_404_NOT_FOUND)
+        return Response({'error': False}, status=status.HTTP_404_NOT_FOUND)
 
