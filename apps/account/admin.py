@@ -5,8 +5,13 @@ from django.utils.translation import gettext_lazy as _
 
 
 class CustomUserAdmin(UserAdmin):
+
+    def group_names(self, obj):
+        return ", ".join([group.name for group in obj.groups.all()])
+
     model = CustomUser
-    list_display = ('phone', 'email', 'first_name', 'last_name', 'surname', 'city', 'name_of_study', 'position', 'is_staff')
+    list_display = ('phone', 'email', 'first_name', 'last_name', 'surname', 'city', 'name_of_study', 'position',
+                    'is_staff', 'group_names')
     fieldsets = (
         (None, {'fields': ('phone', 'password')}),
         ('Персональная информация', {'fields': ('first_name', 'last_name', 'email', 'surname', 'city', 'name_of_study', 'position', 'avatar')}),
