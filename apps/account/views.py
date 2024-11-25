@@ -176,7 +176,16 @@ class FilterUserView(APIView):
     permission_classes = [AllowAny]
     @swagger_auto_schema(
         responses={200: CustomUserDeatilSerializer()},
-        operation_description="Retrieve details of the authenticated user.", tags=['Account']
+        operation_description="Retrieve details of the authenticated user.", tags=['Account'],
+        manual_parameters=[
+            openapi.Parameter(
+                'id',
+                openapi.IN_PATH,
+                description="ID of the receiver (CustomUser ID)",
+                type=openapi.TYPE_INTEGER,
+                required=True,
+            )
+        ]
     )
     def get(self, request, *args, **kwargs):
         queryset = get_object_or_404(CustomUser, id=kwargs.get('id'))
