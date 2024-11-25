@@ -69,7 +69,7 @@ class OrderWork(models.Model):
     number_of_sources_literature = models.IntegerField(default=0, null=False, blank=False, verbose_name=_("Количество источников литературы"))
     foreign_sources = models.BooleanField(null=True, blank=True, verbose_name="Иностранные источники")
     deadline = models.DateField(null=True, blank=True, verbose_name=_("Срок выполнения"))
-    
+    is_activate = models.BooleanField(default=False, null=True, blank=True, verbose_name="Статус")
     qualification_author = models.ForeignKey(
         QualificationAuthor, on_delete=models.CASCADE, null=False, blank=False,
         verbose_name=_("Квалификация автора"), related_name="order_qualification_author"

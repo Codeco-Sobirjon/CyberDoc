@@ -50,7 +50,8 @@ class OrderWorkSerializer(serializers.ModelSerializer):
         model = OrderWork
         fields = ['id', 'number_of_order', 'type_cons', 'item', 'theme', 'min_page_size',
                   'number_of_sources_literature', 'deadline', 'qualification_author',
-                  'shrift', 'guarantee', 'text', 'files', 'author', 'rating', 'review_list', 'foreign_sources']
+                  'shrift', 'guarantee', 'text', 'files', 'author', 'rating', 'review_list', 'foreign_sources',
+                  'is_activate']
 
     def get_files(self, obj):
         files = OrderWorkFiles.objects.select_related('order_work').filter(order_work=obj)
@@ -88,7 +89,7 @@ class OrderWorkCreateAndUpdateSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'type_cons', 'item', 'theme', 'min_page_size',
             'number_of_sources_literature', 'deadline', 'qualification_author',
-            'shrift', 'guarantee', 'text', 'uploaded_files', 'files', 'foreign_sources'
+            'shrift', 'guarantee', 'text', 'uploaded_files', 'files', 'foreign_sources',
         ]
 
     def create(self, validated_data):
