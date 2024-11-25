@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from apps.account.models import CustomUser
+from django.utils.translation import gettext_lazy as _
 
 
 class CustomUserAdmin(UserAdmin):
@@ -23,3 +24,6 @@ class CustomUserAdmin(UserAdmin):
 
 admin.site.register(CustomUser, CustomUserAdmin)
 
+admin.site.site_header = _("CyberDoc Администрации Панель. ")
+admin.site.site_title = _("CyberDoc Панель управления.")
+admin.site.index_title = _("Добро пожаловать в админку CayberDoc.")
