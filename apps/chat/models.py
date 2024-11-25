@@ -17,8 +17,8 @@ class Conversation(models.Model):
     objects = models.Manager()
 
     class Meta:
-        verbose_name = _("Беседа")
-        verbose_name_plural = _("Беседы")
+        verbose_name = _("1. Беседа")
+        verbose_name_plural = _("1. Беседы")
 
 
 class Message(models.Model):
@@ -42,6 +42,6 @@ class Message(models.Model):
     objects = models.Manager()
 
     class Meta:
-        verbose_name = _("Сообщение")
-        verbose_name_plural = _("Сообщения")
+        verbose_name = _("2. Сообщение")
+        verbose_name_plural = _("2. Сообщения")
         ordering = ('-timestamp',)
