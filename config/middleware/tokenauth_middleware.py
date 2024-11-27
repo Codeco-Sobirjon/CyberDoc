@@ -3,6 +3,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from channels.db import database_sync_to_async
 from django.contrib.auth.models import AnonymousUser
 import jwt
+from urllib.parse import parse_qs
 
 
 @database_sync_to_async
@@ -20,17 +21,17 @@ def get_user_from_jwt(token_key):
 
 class TokenAuthMiddleware(BaseMiddleware):
     async def __call__(self, scope, receive, send):
-        headers = dict(scope.get("headers", []))
+        query_string = scope.get("query_string", b"").decode()
+        query_params = parse_qs(query_string)
 
-        if b'authorization' in headers:
+        # Extract the token from the "token" query parameter
+        token_key = query_params.get("token", [None])[0]
+
+        if token_key:
             try:
-                token_name, token_key = headers[b'authorization'].decode().split()
-                if token_name.lower() == 'bearer':
-                    scope['user'] = await get_user_from_jwt(token_key)
-                else:
-                    scope['user'] = AnonymousUser()
+                scope['user'] = await get_user_from_jwt(token_key)
             except Exception as e:
-                print(f"Error parsing authorization header: {e}")
+                print(f"Error parsing token: {e}")
                 scope['user'] = AnonymousUser()
         else:
             scope['user'] = AnonymousUser()
