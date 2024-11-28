@@ -20,19 +20,19 @@ def get_user_from_jwt(token_key):
 
 
 class TokenAuthMiddleware(BaseMiddleware):
+    def __init__(self, inner):
+        self.inner = inner
+
     async def __call__(self, scope, receive, send):
-        query_string = scope.get("query_string", b"").decode()
-        query_params = parse_qs(query_string)
+        # Parse the query string
+        query_string = parse_qs(scope['query_string'].decode())
 
-        # Extract the token from the "token" query parameter
-        token_key = query_params.get("token", [None])[0]
+        # Extract the token
+        token_key = query_string.get('token', [None])[0]
 
+        # Validate the token and set the user in the scope
         if token_key:
-            try:
-                scope['user'] = await get_user_from_jwt(token_key)
-            except Exception as e:
-                print(f"Error parsing token: {e}")
-                scope['user'] = AnonymousUser()
+            scope['user'] = await get_user_from_jwt(token_key)
         else:
             scope['user'] = AnonymousUser()
 
