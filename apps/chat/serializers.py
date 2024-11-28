@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from apps.account.models import CustomUser
 from apps.account.serializers import CustomUserDeatilSerializer
 from apps.chat.models import Conversation, Message
 

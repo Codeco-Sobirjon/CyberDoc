@@ -1,6 +1,4 @@
-from django.shortcuts import get_object_or_404
 from rest_framework import serializers
-
 from apps.account.serializers import CustomUserDeatilSerializer
 from apps.cyberdoc.models import TypeConsultation, QualificationAuthor, Shrift, Guarantee, OrderWork, OrderWorkReview, \
     DescribeProblem, OrderWorkFiles, Portfolio
