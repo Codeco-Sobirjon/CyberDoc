@@ -5,9 +5,20 @@ from apps.chat.models import Conversation, Message
 
 class MessageSerializer(serializers.ModelSerializer):
     sender = CustomUserDeatilSerializer()
+    sender_type = serializers.SerializerMethodField()
     class Meta:
         model = Message
         exclude = ('conversation_id',)
+
+    def get_sender_type(self, obj):
+        conversation = obj.conversation_id
+        user = obj.sender
+        if user:
+            if conversation.initiator == user:
+                return 'initiator'
+            elif conversation.receiver == user:
+                return 'receiver'
+        return 'unknown'
 
 
 class ConversationListSerializer(serializers.ModelSerializer):

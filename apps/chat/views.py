@@ -63,7 +63,7 @@ class GetConversationView(APIView):
     )
     def get(self, request, *args, **kwargs):
         conversation = get_object_or_404(Conversation, id=kwargs.get('convo_id'))
-        serializer = ConversationSerializer(conversation)
+        serializer = ConversationSerializer(conversation, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
