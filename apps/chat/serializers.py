@@ -26,11 +26,6 @@ class MessageSerializer(serializers.ModelSerializer):
                     return 'initiator'
                 elif conversation.receiver == user:
                     return 'receiver'
-            # if :
-            #     if conversation.initiator == user:
-            #         return 'receiver'
-            #     elif conversation.receiver == user:
-            #         return 'initiator'
             return 'unknown'
 
 
@@ -39,7 +34,7 @@ class MessageListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Message
-        fields = ['id', 'sender', 'text', 'timestamp']
+        exclude = ('conversation_id',)
 
 
 class ConversationListSerializer(serializers.ModelSerializer):

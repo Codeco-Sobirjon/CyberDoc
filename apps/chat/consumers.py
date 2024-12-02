@@ -30,17 +30,15 @@ class ChatConsumer(WebsocketConsumer):
 
     def receive(self, text_data=None, bytes_data=None):
         text_data_json = json.loads(text_data)
+
         chat_type = {"type": "chat_message"}
         return_dict = {**chat_type, **text_data_json}
-        # Log when group_send is called
-        print(f"Sending to group: {self.room_group_name}, data: {return_dict}")
         async_to_sync(self.channel_layer.group_send)(
             self.room_group_name,
             return_dict,
         )
 
     def chat_message(self, event):
-        print(f"chat_message called with event: {event}")
         text_data_json = event.copy()
         text_data_json.pop("type")
         message, attachment = (
