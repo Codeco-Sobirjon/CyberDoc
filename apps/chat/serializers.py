@@ -21,16 +21,16 @@ class MessageSerializer(serializers.ModelSerializer):
         user = obj.sender
 
         if user:
-            if student:
+            if student or author:
                 if conversation.initiator == user:
                     return 'initiator'
                 elif conversation.receiver == user:
                     return 'receiver'
-            if author:
-                if conversation.initiator == user:
-                    return 'receiver'
-                elif conversation.receiver == user:
-                    return 'initiator'
+            # if :
+            #     if conversation.initiator == user:
+            #         return 'receiver'
+            #     elif conversation.receiver == user:
+            #         return 'initiator'
             return 'unknown'
 
 
