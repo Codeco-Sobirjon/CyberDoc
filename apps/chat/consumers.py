@@ -60,7 +60,8 @@ class ChatConsumer(WebsocketConsumer):
             message = event["message"]
             attachment = event.get("attachment")
             sender_id = event["sender_id"]
-
+            print(message, "text")
+            print(sender_id, 1)
             sender = CustomUser.objects.get(id=sender_id)
             conversation = Conversation.objects.get(id=int(self.room_name))
 
@@ -79,7 +80,7 @@ class ChatConsumer(WebsocketConsumer):
                 _message = Message.objects.create(
                     sender=sender, text=message, conversation_id=conversation
                 )
-
+            print(_message, "message")
             serializer = MessageListSerializer(instance=_message)
             self.send(text_data=json.dumps(serializer.data))
         except Exception as e:
