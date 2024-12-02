@@ -17,14 +17,16 @@ class ChatConsumer(WebsocketConsumer):
         self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
         self.room_group_name = f"chat_{self.room_name}"
 
-        # Add the channel to the group
+        # Debug log
+        print(f"Adding channel: {self.channel_name} to group: {self.room_group_name}")
+
         async_to_sync(self.channel_layer.group_add)(
             self.room_group_name, self.channel_name
         )
         self.accept()
 
     def disconnect(self, close_code):
-        # Remove the channel from the group
+        print(f"Removing channel: {self.channel_name} from group: {self.room_group_name}")
         async_to_sync(self.channel_layer.group_discard)(
             self.room_group_name, self.channel_name
         )
@@ -59,11 +61,15 @@ class ChatConsumer(WebsocketConsumer):
 
     def chat_message(self, event):
         try:
+            # Skip processing if the message is from the sender
+            if event["sender_id"] == self.scope["user"].id:
+                print(f"Skipping self-message processing for sender: {event['sender_id']}")
+                return
+
             message = event["message"]
             attachment = event.get("attachment")
             sender_id = event["sender_id"]
 
-            # Prevent duplicate sending
             print(f"Processing message from sender: {sender_id}, message: {message}")
 
             sender = CustomUser.objects.get(id=sender_id)
