@@ -34,6 +34,14 @@ class MessageSerializer(serializers.ModelSerializer):
             return 'unknown'
 
 
+class MessageListSerializer(serializers.ModelSerializer):
+    sender = CustomUserDeatilSerializer()
+
+    class Meta:
+        model = Message
+        fields = ['id', 'sender', 'text', 'sender_type', 'timestamp']
+
+
 class ConversationListSerializer(serializers.ModelSerializer):
     initiator = CustomUserDeatilSerializer()
     receiver = CustomUserDeatilSerializer()

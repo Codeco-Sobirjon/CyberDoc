@@ -9,7 +9,7 @@ from django.core.files.base import ContentFile
 
 from apps.account.models import CustomUser
 from apps.chat.models import Message, Conversation
-from apps.chat.serializers import MessageSerializer
+from apps.chat.serializers import MessageSerializer, MessageListSerializer
 
 
 class ChatConsumer(WebsocketConsumer):
@@ -68,7 +68,7 @@ class ChatConsumer(WebsocketConsumer):
                 text=message,
                 conversation_id=conversation,
             )
-        serializer = MessageSerializer(instance=_message)
+        serializer = MessageListSerializer(instance=_message)
 
         self.send(
             text_data=json.dumps(
