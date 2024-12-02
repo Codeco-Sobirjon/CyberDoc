@@ -40,6 +40,7 @@ class ChatConsumer(WebsocketConsumer):
         )
 
     def chat_message(self, event):
+        print(f"chat_message called with event: {event}")
         text_data_json = event.copy()
         text_data_json.pop("type")
         message, attachment = (
@@ -47,25 +48,13 @@ class ChatConsumer(WebsocketConsumer):
             text_data_json.get("attachment"),
         )
 
-        # Check if the conversation exists
-        try:
-            conversation = Conversation.objects.get(id=int(self.room_name))
-        except Conversation.DoesNotExist:
-            print(f"Conversation {self.room_name} does not exist.")
-            return
+        conversation = Conversation.objects.get(id=int(self.room_name))
 
         sender = self.scope['user']
 
-        # Check if the message is already created (optional safeguard)
-        if Message.objects.filter(
-                sender=sender, text=message, conversation_id=conversation
-        ).exists():
-            print("Duplicate message detected, skipping creation.")
-            return
-
-        # Create the message
         if attachment:
             file_str, file_ext = attachment["data"], attachment["format"]
+
             file_data = ContentFile(
                 base64.b64decode(file_str), name=f"{secrets.token_hex(8)}.{file_ext}"
             )
@@ -81,8 +70,6 @@ class ChatConsumer(WebsocketConsumer):
                 text=message,
                 conversation_id=conversation,
             )
-
-        # Serialize and send back the message
         serializer = MessageListSerializer(instance=_message)
 
         self.send(
