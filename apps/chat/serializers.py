@@ -42,7 +42,7 @@ class ConversationListSerializer(serializers.ModelSerializer):
     def get_last_message(self, instance):
         message = instance.message_set.first()
         if message:
-            return MessageSerializer(instance=message).data
+            return MessageSerializer(instance=message, context={'request': self.context.get('request')}).data
         return None
 
 
