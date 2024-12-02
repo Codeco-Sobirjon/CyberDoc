@@ -36,6 +36,7 @@ class ChatConsumer(WebsocketConsumer):
             attachment = text_data_json.get("attachment")
 
             sender = self.scope["user"]
+            print(sender)
             if sender.is_anonymous:
                 self.send(
                     text_data=json.dumps({"error": "Authentication failed"})
