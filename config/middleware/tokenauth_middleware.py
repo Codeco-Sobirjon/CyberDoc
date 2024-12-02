@@ -24,11 +24,7 @@ class TokenAuthMiddleware(BaseMiddleware):
         super().__init__(inner)
 
     async def __call__(self, scope, receive, send):
-        # Parse the query string
         query_string = parse_qs(scope["query_string"].decode())
         token_key = query_string.get("token", [None])[0]
-        print(token_key, "asdasdasd")
-        # Get the user from the token
         scope["user"] = await get_user_from_jwt(token_key) if token_key else AnonymousUser()
-        print(scope["user"], "dsadasdasdasd")
         return await super().__call__(scope, receive, send)

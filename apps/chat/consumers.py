@@ -36,12 +36,14 @@ class ChatConsumer(WebsocketConsumer):
             attachment = text_data_json.get("attachment")
 
             sender = self.scope["user"]
-            print(sender)
             if sender.is_anonymous:
                 self.send(
                     text_data=json.dumps({"error": "Authentication failed"})
                 )
                 return
+
+            # Debug log
+            print(f"Broadcasting message from sender: {sender.id}")
 
             async_to_sync(self.channel_layer.group_send)(
                 self.room_group_name,
@@ -60,8 +62,10 @@ class ChatConsumer(WebsocketConsumer):
             message = event["message"]
             attachment = event.get("attachment")
             sender_id = event["sender_id"]
-            print(message, "text")
-            print(sender_id, 1)
+
+            # Prevent duplicate sending
+            print(f"Processing message from sender: {sender_id}, message: {message}")
+
             sender = CustomUser.objects.get(id=sender_id)
             conversation = Conversation.objects.get(id=int(self.room_name))
 
@@ -80,7 +84,7 @@ class ChatConsumer(WebsocketConsumer):
                 _message = Message.objects.create(
                     sender=sender, text=message, conversation_id=conversation
                 )
-            print(_message.sender, "message")
+
             serializer = MessageListSerializer(instance=_message)
             self.send(text_data=json.dumps(serializer.data))
         except Exception as e:
