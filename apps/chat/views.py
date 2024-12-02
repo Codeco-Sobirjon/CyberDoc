@@ -7,8 +7,8 @@ from django.db.models import Q
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from apps.account.models import CustomUser
-from apps.chat.models import Conversation
-from apps.chat.serializers import ConversationSerializer, ConversationListSerializer
+from apps.chat.models import Conversation, Message
+from apps.chat.serializers import ConversationSerializer, ConversationListSerializer, MessageSerializer
 
 
 class StartConversationView(APIView):
@@ -57,13 +57,15 @@ class GetConversationView(APIView):
         responses={
             status.HTTP_200_OK: openapi.Response(
                 description="Conversation details",
-                schema=ConversationSerializer,
+                schema=MessageSerializer(many=True),
             ),
         }
     )
     def get(self, request, *args, **kwargs):
-        conversation = get_object_or_404(Conversation, id=kwargs.get('convo_id'))
-        serializer = ConversationSerializer(conversation, context={'request': request})
+        conversation = Message.objects.select_related('conversation_id', 'sender').filter(
+            Q(conversation_id=kwargs.get('convo_id'))
+        )
+        serializer = MessageSerializer(conversation, many=True, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -112,14 +114,18 @@ class CheckReceiverHasView(APIView):
     )
     def get(self, request, *args, **kwargs):
         initiator = request.user
-        receiver = get_object_or_404(CustomUser, id=kwargs.get('id'))
-        conversation_exists = Conversation.objects.select_related('initiator').filter(
-            initiator=initiator
-        ).select_related('receiver').filter(
-            receiver=receiver
-        ).first()
-        if conversation_exists:
-            serializer = ConversationSerializer(conversation_exists, context={"request": request})
-            return Response(serializer.data, status=status.HTTP_302_FOUND)
-        return Response({'error': False}, status=status.HTTP_400_BAD_REQUEST)
+        receiver_id = kwargs.get('id')
+
+        receiver = get_object_or_404(CustomUser, id=receiver_id)
+
+        conversation = Conversation.objects.filter(
+            (Q(initiator=initiator) & Q(receiver=receiver)) |
+            (Q(initiator=receiver) & Q(receiver=initiator))
+        ).select_related('initiator', 'receiver').first()
+
+        if conversation:
+            serializer = ConversationSerializer(conversation, context={"request": request})
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response({"detail": "Conversation does not exist"}, status=status.HTTP_404_NOT_FOUND)
 
