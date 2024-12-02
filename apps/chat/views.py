@@ -86,7 +86,7 @@ class ConversationListView(APIView):
             Q(initiator=request.user) |
             Q(receiver=request.user)
         )
-        serializer = ConversationListSerializer(conversation_list, many=True)
+        serializer = ConversationListSerializer(conversation_list, many=True, context={'request': request})
         return Response(serializer.data)
 
 
