@@ -39,7 +39,7 @@ class MessageListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Message
-        fields = ['id', 'sender', 'text', 'sender_type', 'timestamp']
+        fields = ['id', 'sender', 'text', 'timestamp']
 
 
 class ConversationListSerializer(serializers.ModelSerializer):
