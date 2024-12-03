@@ -11,6 +11,8 @@ from apps.account.models import CustomUser
 from apps.chat.models import Message, Conversation
 from apps.chat.serializers import MessageSerializer, MessageListSerializer
 
+import traceback
+
 
 class ChatConsumer(WebsocketConsumer):
     def connect(self):
@@ -44,7 +46,6 @@ class ChatConsumer(WebsocketConsumer):
                 )
                 return
 
-            # Debug log
             print(f"Broadcasting message from sender: {sender.id}")
 
             async_to_sync(self.channel_layer.group_send)(
@@ -61,30 +62,23 @@ class ChatConsumer(WebsocketConsumer):
 
     def chat_message(self, event):
         try:
-            sender_id = event["sender_id"]
+            print(f"Received event: {event}")
+
+            sender_id = event.get("sender_id")
             message = event.get("message", "")
             attachment = event.get("attachment")
 
-            # Debug log
-            print(f"Received message for room: {self.room_group_name}, from sender: {sender_id}")
+            print(f"Sender ID: {sender_id}, Message: {message}, Attachment: {attachment}")
 
-            # Fetch sender
             sender = CustomUser.objects.filter(id=sender_id).first()
             if not sender:
-                print(f"Sender with ID {sender_id} not found.")
-                self.send(text_data=json.dumps({"error": "Sender not found"}))
-                return
-
-            # Fetch conversation
+                raise ValueError(f"Sender with ID {sender_id} not found.")
             try:
-                conversation_id = int(self.room_name)  # Assuming `room_name` is the conversation ID
+                conversation_id = int(self.room_name)
                 conversation = Conversation.objects.get(id=conversation_id)
-            except (ValueError, Conversation.DoesNotExist):
-                print(f"Invalid conversation ID: {self.room_name}")
-                self.send(text_data=json.dumps({"error": "Conversation not found"}))
-                return
+            except (ValueError, Conversation.DoesNotExist) as e:
+                raise ValueError(f"Invalid conversation ID: {self.room_name}") from e
 
-            # Create message
             if attachment:
                 try:
                     file_str = attachment["data"]
@@ -96,22 +90,19 @@ class ChatConsumer(WebsocketConsumer):
                         sender=sender,
                         attachment=file_data,
                         text=message,
-                        conversation=conversation,
+                        conversation_id=conversation,
                     )
                 except Exception as e:
-                    print(f"Attachment handling failed: {e}")
-                    self.send(text_data=json.dumps({"error": "Invalid attachment"}))
-                    return
+                    raise ValueError(f"Attachment processing failed: {e}") from e
             else:
                 new_message = Message.objects.create(
-                    sender=sender, text=message, conversation=conversation
+                    sender=sender, text=message, conversation_id=conversation
                 )
-
-            # Serialize and send the created message
             serializer = MessageListSerializer(instance=new_message)
-            print(f"Message saved successfully: {serializer.data}")
+            print(f"Message successfully saved: {serializer.data}")
             self.send(text_data=json.dumps(serializer.data))
 
         except Exception as e:
             print(f"Error processing chat message: {e}")
-            self.send(text_data=json.dumps({"error": "Failed to process message"}))
+            traceback.print_exc()
+            self.send(text_data=json.dumps({"error": f"Failed to process message: {str(e)}"}))
