@@ -30,8 +30,6 @@ class MessageSerializer(serializers.ModelSerializer):
 
 
 class MessageListSerializer(serializers.ModelSerializer):
-    sender = CustomUserDeatilSerializer()
-
     class Meta:
         model = Message
         exclude = ('conversation_id',)
