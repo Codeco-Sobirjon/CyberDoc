@@ -64,7 +64,7 @@ class GetConversationView(APIView):
     def get(self, request, *args, **kwargs):
         conversation = Message.objects.select_related('conversation_id', 'sender').filter(
             Q(conversation_id=kwargs.get('convo_id'))
-        ).order_by('-id')
+        )
         serializer = MessageSerializer(conversation, many=True, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
