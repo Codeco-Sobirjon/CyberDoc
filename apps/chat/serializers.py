@@ -13,36 +13,15 @@ class MessageSerializer(serializers.ModelSerializer):
         fields = ['id', 'sender', 'text', 'sender_type', 'timestamp']
 
     def get_sender_type(self, obj):
-
-        request_user = self.context.get('request').user
-
-        student = custom_user_has_student_role(request_user)
-        author = custom_user_has_author_role(request_user)
-
-        conversation = obj.conversation_id
+        user = self.context.get('request')
         sender = obj.sender
-
-        if student:
-            if request_user == conversation.initiator:
-                if sender == request_user:
-                    return 'initiator'
-                else:
-                    return 'receiver'
-        elif author:
-            if request_user == conversation.receiver:
-                if sender == request_user:
-                    return 'initiator'
-                else:
-                    return 'receiver'
-
-        return 'unknown'
-        # if user:
-        #     if student or author:
-        #         if conversation.initiator == user:
-        #             return 'initiator'
-        #         elif conversation.receiver == user:
-        #             return 'receiver'
-        #     return 'unknown'
+        conversation = obj.conversation_id
+        if user == sender:
+            if user == conversation.initiator:
+                return 'initiator'
+            elif user == conversation.receiver:
+                return 'initiator'
+        return 'receiver'
 
 
 class MessageListSerializer(serializers.ModelSerializer):
