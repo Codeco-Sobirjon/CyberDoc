@@ -4,27 +4,35 @@ from apps.chat.models import Conversation, Message
 from apps.chat.utils import custom_user_has_student_role, custom_user_has_author_role
 
 
-def get_sender_type(self, obj):
-    # Get the current user from the request context
-    request_user = self.context.get('request').user
+class MessageSerializer(serializers.ModelSerializer):
+    sender = CustomUserDeatilSerializer()
+    sender_type = serializers.SerializerMethodField()
 
-    # Check roles of the current user
-    student = custom_user_has_student_role(request_user)
-    author = custom_user_has_author_role(request_user)
+    class Meta:
+        model = Message
+        fields = ['id', 'sender', 'text', 'sender_type', 'timestamp']
 
-    # Retrieve the conversation and sender from the message
-    conversation = obj.conversation_id
-    user = obj.sender
+    def get_sender_type(self, obj):
+        # Get the current user from the request context
+        request_user = self.context.get('request').user
 
-    # Determine the initiator and receiver in the conversation
-    if student and conversation.student == user:
-        return 'initiator' if conversation.created_by == user else 'receiver'
+        # Check roles of the current user
+        student = custom_user_has_student_role(request_user)
+        author = custom_user_has_author_role(request_user)
 
-    if author and conversation.author == user:
-        return 'initiator' if conversation.created_by == user else 'receiver'
+        # Retrieve the conversation and sender from the message
+        conversation = obj.conversation_id
+        user = obj.sender
 
-    # If no match, return None or a default value
-    return None
+        # Determine the initiator and receiver in the conversation
+        if student and conversation.student == user:
+            return 'initiator' if conversation.created_by == user else 'receiver'
+
+        if author and conversation.author == user:
+            return 'initiator' if conversation.created_by == user else 'receiver'
+
+        # If no match, return None or a default value
+        return None
 
 
 class MessageListSerializer(serializers.ModelSerializer):
