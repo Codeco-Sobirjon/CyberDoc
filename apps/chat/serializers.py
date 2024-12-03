@@ -21,18 +21,12 @@ class MessageSerializer(serializers.ModelSerializer):
         conversation = obj.conversation_id
         sender = obj.sender
 
-        if request_user == conversation.initiator:
+        if conversation.initiator == request_user:
             # Logged-in user is the initiator
-            if sender == request_user:
-                return 'initiator'
-            elif sender == conversation.receiver:
-                return 'receiver'
-        elif request_user == conversation.receiver:
+            return 'initiator' if sender == request_user else 'receiver'
+        elif conversation.receiver == request_user:
             # Logged-in user is the receiver
-            if sender == request_user:
-                return 'receiver'
-            elif sender == conversation.initiator:
-                return 'initiator'
+            return 'receiver' if sender == request_user else 'initiator'
         return 'unknown'
 
 
