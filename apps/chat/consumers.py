@@ -61,37 +61,57 @@ class ChatConsumer(WebsocketConsumer):
 
     def chat_message(self, event):
         try:
-            # Skip processing if the message is from the sender
-            if event["sender_id"] == self.scope["user"].id:
-                print(f"Skipping self-message processing for sender: {event['sender_id']}")
+            sender_id = event["sender_id"]
+            message = event.get("message", "")
+            attachment = event.get("attachment")
+
+            # Debug log
+            print(f"Received message for room: {self.room_group_name}, from sender: {sender_id}")
+
+            # Fetch sender
+            sender = CustomUser.objects.filter(id=sender_id).first()
+            if not sender:
+                print(f"Sender with ID {sender_id} not found.")
+                self.send(text_data=json.dumps({"error": "Sender not found"}))
                 return
 
-            message = event["message"]
-            attachment = event.get("attachment")
-            sender_id = event["sender_id"]
+            # Fetch conversation
+            try:
+                conversation_id = int(self.room_name)  # Assuming `room_name` is the conversation ID
+                conversation = Conversation.objects.get(id=conversation_id)
+            except (ValueError, Conversation.DoesNotExist):
+                print(f"Invalid conversation ID: {self.room_name}")
+                self.send(text_data=json.dumps({"error": "Conversation not found"}))
+                return
 
-            print(f"Processing message from sender: {sender_id}, message: {message}")
-
-            sender = CustomUser.objects.get(id=sender_id)
-            conversation = Conversation.objects.get(id=int(self.room_name))
-
+            # Create message
             if attachment:
-                file_str, file_ext = attachment["data"], attachment["format"]
-                file_data = ContentFile(
-                    base64.b64decode(file_str), name=f"{secrets.token_hex(8)}.{file_ext}"
-                )
-                _message = Message.objects.create(
-                    sender=sender,
-                    attachment=file_data,
-                    text=message,
-                    conversation_id=conversation,
-                )
+                try:
+                    file_str = attachment["data"]
+                    file_ext = attachment["format"]
+                    file_data = ContentFile(
+                        base64.b64decode(file_str), name=f"{secrets.token_hex(8)}.{file_ext}"
+                    )
+                    new_message = Message.objects.create(
+                        sender=sender,
+                        attachment=file_data,
+                        text=message,
+                        conversation=conversation,
+                    )
+                except Exception as e:
+                    print(f"Attachment handling failed: {e}")
+                    self.send(text_data=json.dumps({"error": "Invalid attachment"}))
+                    return
             else:
-                _message = Message.objects.create(
-                    sender=sender, text=message, conversation_id=conversation
+                new_message = Message.objects.create(
+                    sender=sender, text=message, conversation=conversation
                 )
 
-            serializer = MessageListSerializer(instance=_message)
+            # Serialize and send the created message
+            serializer = MessageListSerializer(instance=new_message)
+            print(f"Message saved successfully: {serializer.data}")
             self.send(text_data=json.dumps(serializer.data))
+
         except Exception as e:
-            self.send(text_data=json.dumps({"error": str(e)}))
+            print(f"Error processing chat message: {e}")
+            self.send(text_data=json.dumps({"error": "Failed to process message"}))
