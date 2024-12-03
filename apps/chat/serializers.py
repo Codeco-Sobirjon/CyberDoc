@@ -13,31 +13,29 @@ class MessageSerializer(serializers.ModelSerializer):
         fields = ['id', 'sender', 'text', 'sender_type', 'timestamp']
 
     def get_sender_type(self, obj):
-        # Get the logged-in user from the request context
+
         request_user = self.context.get('request').user
 
-        # Determine the role of the logged-in user
-        is_student = custom_user_has_student_role(request_user)
-        is_author = custom_user_has_author_role(request_user)
+        student = custom_user_has_student_role(request_user)
+        author = custom_user_has_author_role(request_user)
 
-        # Fetch conversation and sender details
         conversation = obj.conversation_id
         sender = obj.sender
 
-        # Logic for students
-        if is_student and request_user == conversation.initiator:
-            # If the logged-in user is a student and the initiator
-            return 'initiator' if sender == request_user else 'receiver'
+        if student:
+            if request_user == conversation.initiator:
+                if sender == request_user:
+                    return 'initiator'
+                else:
+                    return 'receiver'
+        elif author:
+            if request_user == conversation.receiver:
+                if sender == request_user:
+                    return 'initiator'
+                else:
+                    return 'receiver'
 
-        # Logic for authors
-        if is_author and request_user == conversation.receiver:
-            # If the logged-in user is an author and the receiver
-            return 'receiver' if sender == request_user else 'initiator'
-
-        # Default case
         return 'unknown'
-
-
         # if user:
         #     if student or author:
         #         if conversation.initiator == user:
