@@ -14,19 +14,19 @@ class MessageSerializer(serializers.ModelSerializer):
 
     def get_sender_type(self, obj):
 
+        request_user = self.context.get('request').user
+
         student = custom_user_has_student_role(self.context.get('request').user)
         author = custom_user_has_author_role(self.context.get('request').user)
 
         conversation = obj.conversation_id
-        user = obj.sender
+        sender = obj.sender
 
-        if user:
-            if student or author:
-                if conversation.initiator == user:
-                    return 'initiator'
-                elif conversation.receiver == user:
-                    return 'receiver'
-            return 'unknown'
+        if sender == conversation.initiator:
+            return 'initiator' if sender == request_user else 'receiver'
+        elif sender == conversation.receiver:
+            return 'receiver' if sender == request_user else 'initiator'
+        return 'unknown'
 
 
 class MessageListSerializer(serializers.ModelSerializer):
