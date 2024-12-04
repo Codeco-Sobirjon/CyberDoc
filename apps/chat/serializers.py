@@ -30,9 +30,14 @@ class MessageSerializer(serializers.ModelSerializer):
 
 
 class MessageListSerializer(serializers.ModelSerializer):
+    sender_type = serializers.SerializerMethodField()
+
     class Meta:
         model = Message
         exclude = ('conversation_id',)
+
+    def get_sender_type(self, obj):
+        return "initiator"
 
 
 class ConversationListSerializer(serializers.ModelSerializer):

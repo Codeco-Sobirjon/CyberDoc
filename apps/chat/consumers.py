@@ -19,7 +19,6 @@ class ChatConsumer(WebsocketConsumer):
         self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
         self.room_group_name = f"chat_{self.room_name}"
 
-        # Debug log
         print(f"Adding channel: {self.channel_name} to group: {self.room_group_name}")
 
         async_to_sync(self.channel_layer.group_add)(
@@ -46,7 +45,6 @@ class ChatConsumer(WebsocketConsumer):
 
             print(f"Received message: {message} from {sender.id}")
 
-            # Save the message only once
             try:
                 conversation_id = int(self.room_name)
                 conversation = Conversation.objects.get(id=conversation_id)
@@ -75,12 +73,11 @@ class ChatConsumer(WebsocketConsumer):
 
             print(f"Message successfully saved: {new_message.id}")
 
-            # Broadcast the saved message
             async_to_sync(self.channel_layer.group_send)(
                 self.room_group_name,
                 {
                     "type": "chat_message",
-                    "message_id": new_message.id,  # Pass the saved message ID
+                    "message_id": new_message.id,
                 },
             )
         except Exception as e:
@@ -92,17 +89,16 @@ class ChatConsumer(WebsocketConsumer):
 
             message_id = event.get("message_id")
 
-            # Retrieve the saved message
             new_message = Message.objects.filter(id=message_id).first()
             if not new_message:
                 raise ValueError(f"Message with ID {message_id} not found.")
 
-            # Serialize the message for sending to WebSocket
-            serialized_message = MessageListSerializer(new_message).data
+            serialized_message = MessageListSerializer(new_message, context={'request': self.scope["user"]}).data
 
-            # Send the serialized message to WebSocket
             self.send(text_data=json.dumps(serialized_message))
+
         except Exception as e:
+
             print(f"Error processing chat message: {e}")
             traceback.print_exc()
             self.send(text_data=json.dumps({"error": f"Failed to process message: {str(e)}"}))
