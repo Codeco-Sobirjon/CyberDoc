@@ -37,20 +37,12 @@ class MessageListSerializer(serializers.ModelSerializer):
         exclude = ('conversation_id',)
 
     def get_sender_type(self, obj):
-        current_user = self.context.get('request')
-        if not current_user or not current_user.is_authenticated:
-            return None
-
-        conversation = obj.conversation_id
-
-        if conversation.initiator == current_user:
-
-            return "initiator" if obj.sender == current_user else "receiver"
-        elif conversation.receiver == current_user:
-
-            return "receiver" if obj.sender == current_user else "initiator"
-
-        return None
+        user = self.context.get('request')
+        sender = obj.sender
+        if sender:
+            return 'initiator'
+        else:
+            return 'receiver'
 
 
 class ConversationListSerializer(serializers.ModelSerializer):
